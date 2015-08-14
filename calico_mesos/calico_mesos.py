@@ -387,7 +387,7 @@ def release(args):
                 else:
                     ips_validated.add(ip)
             # All IPs validated, call procedure
-            return _release_ips(ips)
+            return _release_ips(ips_validated)
 
     else:
         # uid supplied.
