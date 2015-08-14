@@ -303,6 +303,12 @@ def allocate(args):
         return error_message("Missing uid")
     if not isinstance(uid, (str, unicode)):
         return error_message("uid must be a string, not %s", uid)
+    try:
+        # Convert to string since libcalico requires uids to be strings
+        uid = str(uid)
+    except ValueError:
+        return error_message("Invalid UID: %s" % uid)
+
     if hostname is None:
         return error_message("Missing hostname")
     if num_ipv4 is None:
@@ -336,8 +342,10 @@ def _allocate(num_ipv4, num_ipv6, hostname, uid):
     try:
         result = datastore.auto_assign_ips(num_ipv4, num_ipv6, uid, {},
                                            hostname=hostname)
-        result_json = {"ipv4": result[0],
-                       "ipv6": result[1],
+        ipv4_strs = [str(ip) for ip in result[0]]
+        ipv6_strs = [str(ip) for ip in result[1]]
+        result_json = {"ipv4": ipv4_strs,
+                       "ipv6": ipv6_strs,
                        "error": None}
         return json.dumps(result_json)
     except Exception as e:
