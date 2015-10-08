@@ -1,0 +1,12 @@
+[Unit]
+Description=Calico
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+EnvironmentFile=/etc/sysconfig/calico
+ExecStart=/usr/bin/calicoctl node --detach=false
+
+[Install]
+WantedBy=multi-user.target
