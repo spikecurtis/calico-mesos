@@ -1,1 +1,0 @@
-export FQDN=`hostname -f`
