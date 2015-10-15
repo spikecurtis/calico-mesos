@@ -42,7 +42,7 @@ mv protobuf.jar /usr/share/java/
 # Clone Mesos (master branch)
 git clone https://github.com/apache/mesos.git /mesos
 cd /mesos
-git checkout 0.25.0-rc2
+git checkout 0.25.0
 git log -n 1
 
 # Bootstrap
