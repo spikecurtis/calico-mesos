@@ -156,10 +156,6 @@ Next, download the unit files
     $ chmod +x calicoctl
     $ sudo cp calicoctl /usr/bin/
 
-First, we'll use `calicoctl` to ensure the correct kernel modules are loaded (`iptables` and `xt_set`).
-
-    $ sudo calicoctl checksystem --fix
-
 You can learn more about `calicoctl` by running `calicoctl --help`.
 
 You'll need to configure Calico with the correct location of the etcd service.  In the following line, replace `masterip` with the IP address of the Master node.
