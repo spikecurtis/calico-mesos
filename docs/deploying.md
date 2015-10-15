@@ -97,19 +97,21 @@ Pull the Docker images.  This will take a few minutes.
     $ sudo docker pull mesosphere/marathon:v0.9.1
     $ sudo docker pull calico/node:v0.7.0
 
+Next, download the unit files
 
     $ wget https://github.com/projectcalico/calico-mesos/releases/0.1/units.tgz
 
 ## Zookeeper
 
-We'll use systemd to keep Zookeeper running.  Copy the [Zookeeper unit file](units/zookeeper.service) into `/etc/systemd/system/`
-
+We'll use systemd to keep Zookeeper running.  Copy the unit into `/etc/systemd/system/`.  This unit file starts a Docker container running Zookeeper.
 
     $ sudo cp zookeeper.service /usr/lib/systemd/system/
     $ sudo systemctl enable zookeeper.service
     $ sudo systemctl start zookeeper.service
 
 ## Mesos Master
+
+Create and enable the `mesos-master` unit, which starts a Docker container running Mesos.
 
     $ sudo cp mesos-master.service /usr/lib/systemd/system/
     $ sudo systemctl enable mesos-master.service
@@ -118,7 +120,7 @@ We'll use systemd to keep Zookeeper running.  Copy the [Zookeeper unit file](uni
 ## Etcd
 
 `etcd` needs your fully qualified domain name to start correctly.  The included
-unit file looks for this value in `/etc/sysconfig/etcd`
+unit file looks for this value in `/etc/sysconfig/etcd`.
 
     $ sudo sh -c 'echo FQDN=`hostname -f` > /etc/sysconfig/etcd'
     $ sudo cp etcd.service /usr/lib/systemd/system/
@@ -127,18 +129,38 @@ unit file looks for this value in `/etc/sysconfig/etcd`
 
 ## Marathon
 
+Lastly, start Marathon, a Mesos framework you can use to start arbitrary tasks on your cluster.
+
     $ sudo cp marathon.service /usr/lib/systemd/system/
     $ sudo systemctl enable marathon.service
     $ sudo systemctl start marathon.service
 
 # Set up Agent Services
 
+Do this for each compute host you'll use in your Mesos cluster.
+
+Pull the Docker images.  This will take a few minutes.
+
+    $ sudo docker pull spikecurtis/mesos-calico:0.25.0-rc2
+    $ sudo docker pull calico/node:v0.7.0
+
+Next, download the unit files
+
+    $ wget https://github.com/projectcalico/calico-mesos/releases/0.1/units.tgz
+
 ## Calico
+
+`calicoctl` is a small CLI tool to control your Calico network.  It's used to start Calico services on your compute host, as well as inspect and modify Calico configuration.
 
     $ curl -L -O https://github.com/projectcalico/calico-docker/releases/download/v0.7.0/calicoctl
     $ chmod +x calicoctl
     $ sudo cp calicoctl /usr/bin/
+
+First, we'll use `calicoctl` to ensure the correct kernel modules are loaded (`iptables` and `xt_set`).
+
     $ sudo calicoctl checksystem --fix
+
+You can learn more about `calicoctl` by running `calicoctl --help`.
 
 You'll need to configure Calico with the correct location of the etcd service.  In the following line, replace `masterip` with the IP address of the Master node.
 
@@ -185,8 +207,7 @@ The Calico framework launches a series of tasks on your Mesos cluster to verify 
 
 At time of writing Marathon still uses the old Mesos networking, rather than Calico IP-per-container networking.  We still include it so you can test backward compatibility.  Try launching some tasks.
 
-
-
+[calico]: http://projectcalico.org
 [mesos]: https://mesos.apache.org/
 [net-modules]: https://github.com/mesosphere/net-modules
 [docker]: https://www.docker.com/
